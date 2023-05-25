@@ -2,7 +2,7 @@ const userModel = require("../models/userModel.js");
 const bcrypt = require("bcrypt");
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const user = require("../models/userModel.js");
+const User = require("../models/userModel.js");
 const { body, validationResult } = require("express-validator");
 
 class userController {
@@ -138,6 +138,39 @@ class userController {
         .json({ status: "failed", message: "All Fields Are Required" });
     }
   };
+
+  static userUpdate = async (req, res, next) => {
+    const { name, email, password, phoneNo, DateOfBirth, username } = req.body;
+    const newUserData = {
+      name,
+      email,
+      password,
+      phoneNo,
+      DateOfBirth,
+      username,
+    };
+    const userExists = await User.findOne({
+      $or: [{ email }, { username }],
+    });
+    if (userExists && userExists._id.toString() !== req.user._id.toString()) {
+      return next(new ErrorHandler("User Already Exists", 404));
+    }
+    if (req.body.password) {
+      try {
+        const salt = await bcrypt.genSalt(10);
+        req.body.password = await bcrypt.hash(req.body.password, salt);
+      } catch (err) {
+        return res.status(500).json(err);
+      }
+    }
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      $set: req.body,
+    });
+    res.status(200).json({
+      success: true,
+    });
+  };
+
   static userLogout = async (req, resp) => {
     try {
       // Clear the JWT cookie by setting an expired token

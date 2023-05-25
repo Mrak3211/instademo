@@ -14,7 +14,6 @@ var checkUserAuth = async (req, res, next) => {
 
       // Get User from Token
       req.user = await userModel.findById(userID).select("-password");
-      console.log(req.user);
       next();
     } catch (error) {
       console.log(error);
