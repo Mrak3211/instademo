@@ -54,7 +54,7 @@ class userController {
           username: username,
         });
         await newUser.save();
-        console.log(newUser);
+        // console.log(newUser);
         return resp
           .status(201)
           .json({ status: "success", message: "User Registered Successfully" });
@@ -216,7 +216,7 @@ class userController {
           senderId,
           receiverId,
         });
-        console.log("existingConnection============>", existingConnection);
+        // console.log("existingConnection============>", existingConnection);
         if (existingConnection) {
           return res.status(409).json({
             status: "failed",
@@ -299,8 +299,8 @@ class userController {
     // console.log(req.user.id); // Sender id
     const receiverId = req.params.id;
     const senderId = req.user.id;
-    console.log(receiverId);
-    console.log(senderId);
+    // console.log(receiverId);
+    // console.log(senderId);
     try {
       const connection = await Connection.findOne({
         senderId,

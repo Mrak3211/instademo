@@ -11,7 +11,7 @@ const multer = require("multer");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uname = req.user.id;
-    console.log(uname);
+    // console.log(uname);
     const uploadPath = path.join(__dirname, `../public/uploads/${uname}`);
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
@@ -136,8 +136,8 @@ class PostController {
     try {
       const postId = req.params.id;
       const userId = req.user.id;
-      console.log(postId);
-      console.log(userId);
+      // console.log(postId);
+      // console.log(userId);
       const post = await Post.findById(postId);
       if (!post) {
         return res.status(404).json({
@@ -191,7 +191,7 @@ class PostController {
           message: "You have not liked this post",
         });
       }
-      console.log(like);
+      // console.log(like);
       await like.deleteOne();
       res.status(200).json({
         status: "success",
