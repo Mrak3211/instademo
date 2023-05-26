@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
+const Connection = require("../models/connection.js");
 const { body, validationResult } = require("express-validator");
 
 class userController {
@@ -194,29 +195,143 @@ class userController {
     // console.log(req.user.id); // Sender id
     if (req.user.id !== req.params.id) {
       try {
-        const receverUser = await User.findById(req.params.id);
-        const senderUser = await User.findById(req.user.id);
+        const receiverId = req.params.id;
+        const senderId = req.user.id;
+        const receiverUser = await User.findById(receiverId);
+        const senderUser = await User.findById(senderId);
+
+        if (!receiverUser || !senderUser) {
+          return res.status(404).json({
+            status: "failed",
+            message: "User not found",
+          });
+        }
         // console.log("receverUser========>", receverUser);
         // console.log("senderUser=========>", senderUser);
         // console.log(!receverUser.followers.includes(senderUser.id));
-        console.log(receverUser.username);
-        if (!receverUser.followers.includes(senderUser.id)) {
-        } else {
-          res.status(400).send({
-            status: "Failed",
-            message: `You Already Followed ${receverUser.username}`,
+        // console.log(receverUser.username);
+        // console.log({ followers: senderUser.id });
+
+        const existingConnection = await Connection.findOne({
+          senderId,
+          receiverId,
+        });
+        console.log("existingConnection============>", existingConnection);
+        if (existingConnection) {
+          return res.status(409).json({
+            status: "failed",
+            message: "Connection request already exists",
           });
         }
+        const newConnection = new Connection({
+          senderId,
+          receiverId,
+        });
+        await newConnection.save();
+        // receiverUser.followers.push(senderId);
+        // senderUser.followings.push(receiverId);
+        // await receiverUser.save();
+        // await senderUser.save();
+        res.status(200).json({
+          status: "success",
+          senderId: senderUser.id,
+          receiverId: receiverUser.id,
+          message: `Follow request sent to ${receiverUser.username}`,
+        });
       } catch (error) {
-        res.status(404).send({
-          status: "Failed",
-          message: "Something Went Wrong",
+        console.error(error);
+        res.status(500).json({
+          status: "failed",
+          message: "Something went wrong",
         });
       }
     } else {
-      res.status(400).send({
-        status: "Failed",
-        message: "You Cannot Follow Yourself",
+      res.status(400).json({
+        status: "failed",
+        message: "You cannot follow yourself",
+      });
+    }
+  };
+  static updateFollowRequest = async (req, res) => {
+    const { requestId, status } = req.body;
+    try {
+      const connection = await Connection.findById(requestId);
+      if (!connection) {
+        return res.status(404).json({
+          status: "failed",
+          message: "Connection request not found",
+        });
+      }
+      // console.log("status=============>", status);
+      // console.log("connection.status=============>", connection.status);
+      connection.status = status;
+      await connection.save();
+      // if (status === 'accepted') {
+      // Update followers and followings arrays based on the connection status
+      // const receiverUser = await User.findByIdAndUpdate(connection.receiverId, {
+      //   $addToSet: { followers: connection.senderId },
+      // });
+      // const senderUser = await User.findByIdAndUpdate(connection.senderId, {
+      //   $addToSet: { followings: connection.receiverId },
+      // });
+      // if (!receiverUser || !senderUser) {
+      //   return res.status(404).json({
+      //     status: "failed",
+      //     message: "User not found",
+      //   });
+      // }
+      // }
+      res.status(200).json({
+        status: "success",
+        message: "Connection request updated successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: "failed",
+        message: "Something went wrong",
+      });
+    }
+  };
+
+  static userUnFollow = async (req, res) => {
+    // console.log(req.params.id); // Recever id
+    // console.log(req.user.id); // Sender id
+    const receiverId = req.params.id;
+    const senderId = req.user.id;
+    console.log(receiverId);
+    console.log(senderId);
+    try {
+      const connection = await Connection.findOne({
+        senderId,
+        receiverId,
+      });
+      // console.log("connection=======>", connection);
+      // console.log("senderId=======>", senderId);
+      // console.log("receiverId=======>", receiverId);
+      if (!connection) {
+        return res.status(404).json({
+          status: "failed",
+          message: "Connection not found",
+        });
+      }
+      if (connection.status === "Pending") {
+        return res.status(400).json({
+          status: "failed",
+          message: "Connection request is already pending",
+        });
+      }
+      connection.status = "Pending";
+      await connection.save();
+      res.status(200).json({
+        status: "success",
+        message: "Unfollowed user successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: "failed",
+        message: "Something went wrong",
       });
     }
   };

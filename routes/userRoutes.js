@@ -10,6 +10,11 @@ userRoutes.post("/login", userController.userLogin);
 userRoutes.post("/logout", requireLogin, userController.userLogout);
 userRoutes.put("/userUpdate/:id", requireLogin, userController.userUpdate);
 userRoutes.put("/:id/follow", requireLogin, userController.userFollow);
-// userRoutes.put("/:id/unfollow", requireLogin, userController.userUnFollow);
+userRoutes.put(
+  "/followRequest",
+  requireLogin,
+  userController.updateFollowRequest
+);
+userRoutes.put("/:id/unfollow", requireLogin, userController.userUnFollow);
 
 module.exports = userRoutes;

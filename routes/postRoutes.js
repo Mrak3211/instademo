@@ -7,11 +7,9 @@ const {
 const dotenv = require("dotenv");
 const requireLogin = require("../middlewares/auth-middleware.js");
 const post = require("../models/postModel.js");
-// const upload = require("../controllers/postController.js");
-// const uploadsingle = require("../middlewares/multer.js");
-// const uploadsingle = require("../controllers/postController.js");
 
 postRoutes.get("/allpost", requireLogin, PostController.allPost);
+postRoutes.get("/feed", requireLogin, PostController.userFeed);
 postRoutes.get("/public/uploads");
 
 postRoutes.post(
@@ -23,6 +21,7 @@ postRoutes.post(
 
 postRoutes.get("/myposts", requireLogin, PostController.myPost);
 postRoutes.put("/:id/like", requireLogin, PostController.likePost);
+postRoutes.put("/:id/unlike", requireLogin, PostController.unLikePost);
 postRoutes.put(
   "/:id/updatePost",
   requireLogin,
