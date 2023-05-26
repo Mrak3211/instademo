@@ -189,6 +189,37 @@ class userController {
         .json({ status: "failed", message: "Unable to logout" });
     }
   };
+  static userFollow = async (req, res) => {
+    // console.log(req.params.id); // Recever id
+    // console.log(req.user.id); // Sender id
+    if (req.user.id !== req.params.id) {
+      try {
+        const receverUser = await User.findById(req.params.id);
+        const senderUser = await User.findById(req.user.id);
+        // console.log("receverUser========>", receverUser);
+        // console.log("senderUser=========>", senderUser);
+        // console.log(!receverUser.followers.includes(senderUser.id));
+        console.log(receverUser.username);
+        if (!receverUser.followers.includes(senderUser.id)) {
+        } else {
+          res.status(400).send({
+            status: "Failed",
+            message: `You Already Followed ${receverUser.username}`,
+          });
+        }
+      } catch (error) {
+        res.status(404).send({
+          status: "Failed",
+          message: "Something Went Wrong",
+        });
+      }
+    } else {
+      res.status(400).send({
+        status: "Failed",
+        message: "You Cannot Follow Yourself",
+      });
+    }
+  };
 }
 
 module.exports = userController;
