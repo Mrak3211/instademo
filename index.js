@@ -13,16 +13,24 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 const cors = require("cors");
 const path = require("path");
+const ejs = require("ejs");
 app.use(cors());
+var cookieParser = require("cookie-parser");
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(
   "/public/uploads",
   express.static(path.join(__dirname, "public/uploads"))
 );
+app.set("views", __dirname + "/views");
 app.use(
   "/files",
   express.static(path.resolve(__dirname, "..", "uploads", "resized"))
 );
+// view engine setup
+app.set("view engine", "ejs");
 
 app.use(express.json());
 

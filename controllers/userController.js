@@ -7,7 +7,12 @@ const Connection = require("../models/connection.js");
 const { body, validationResult } = require("express-validator");
 
 class userController {
+  static viewRegistration = (req, res) => {
+    res.render("registration");
+  };
+
   static userRegistration = async (req, resp) => {
+    console.log(req.body);
     const validationRules = [
       body("name").notEmpty().withMessage("Name is required"),
       body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
@@ -71,6 +76,9 @@ class userController {
     }
   };
 
+  static viewLogin = (req, res) => {
+    res.render("login");
+  };
   static userLogin = async (req, resp) => {
     const validationRules = [
       body("usernameOrEmail")
@@ -333,6 +341,59 @@ class userController {
         status: "failed",
         message: "Something went wrong",
       });
+    }
+  };
+  static renderMyProfile = async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id);
+      res.render("profile", { user });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  };
+  static getMyProfile = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  };
+  static updateMyProfile = async (req, res) => {
+    try {
+      const { email, phoneNo, dateOfBirth } = req.body;
+
+      // Find the user in the database by ID
+      const user = await userModel.findById(req.user._id);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: "failed", message: "User not found" });
+      }
+
+      // Update the user's profile details
+      user.email = email;
+      user.phoneNo = phoneNo;
+      user.dateOfBirth = dateOfBirth;
+
+      // Save the updated user in the database
+      await user.save();
+
+      res
+        .status(200)
+        .json({ status: "success", message: "Profile updated successfully" });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
     }
   };
 }
