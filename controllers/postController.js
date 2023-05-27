@@ -1,3 +1,5 @@
+// postController.js
+
 const express = require("express");
 const mongoose = require("mongoose");
 const Post = require("../models/postModel.js");
