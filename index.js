@@ -16,6 +16,8 @@ const path = require("path");
 const ejs = require("ejs");
 app.use(cors());
 var cookieParser = require("cookie-parser");
+const { PostController } = require("./controllers/postController.js");
+const Post = require("./models/postModel.js");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -24,13 +26,13 @@ app.use(
   "/public/uploads",
   express.static(path.join(__dirname, "public/uploads"))
 );
-app.set("views", __dirname + "/views");
 app.use(
   "/files",
   express.static(path.resolve(__dirname, "..", "uploads", "resized"))
 );
 // view engine setup
 app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
 
 app.use(express.json());
 

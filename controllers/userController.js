@@ -8,6 +8,9 @@ const { body, validationResult } = require("express-validator");
 
 class userController {
   static viewRegistration = (req, res) => {
+    if (req.cookies.jwt) {
+      return res.redirect("/");
+    }
     res.render("registration");
   };
 
@@ -77,6 +80,9 @@ class userController {
   };
 
   static viewLogin = (req, res) => {
+    if (req.cookies.jwt) {
+      return res.redirect("/");
+    }
     res.render("login");
   };
   static userLogin = async (req, resp) => {
@@ -365,6 +371,22 @@ class userController {
       res.status(500).json({ message: "Server Error" });
     }
   };
+  static updateUserProfile = (req, res) => {
+    const { name, email, phoneNo, dateOfBirth } = req.body;
+    User.findByIdAndUpdate(
+      req.user.id,
+      { name, email, phoneNo, dateOfBirth },
+      { new: true }
+    )
+      .then((updatedUser) => {
+        const user = req.user;
+        res.render("updateProfile", { user });
+      })
+      .catch((error) => {
+        res.render("error", { error });
+      });
+  };
+
   static updateMyProfile = async (req, res) => {
     try {
       const { email, phoneNo, dateOfBirth } = req.body;

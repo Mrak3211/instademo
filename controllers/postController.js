@@ -25,34 +25,34 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 const uploadSingle = upload.single("pic");
-
 class PostController {
-  static allPost(req, res) {
-    Post.find()
-      .populate("postedBy", "_id name")
-      .sort("-createdAt")
-      .then((posts) => {
-        res.json({ posts });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({ error: "An error occurred" });
-      });
-  }
+  static allPost = async (req, res) => {
+    try {
+      const postt = await Post.find()
+        .populate("postedBy", "_id name")
+        .sort("-createdAt");
+
+      res.render("allPost", { postt });
+      // console.log("postt=======>", postt);
+    } catch (error) {
+      res.status(500).json({ error: "An error occurred" });
+    }
+  };
   static userFeed = async (req, res) => {
     try {
       const userId = req.user.id;
       const user = User.findById(userId);
       const connections = await Connection.find({ senderId: userId });
+      console.log("connections==================>", connections);
       const followingUser = await connections.map(
         (connection) => connection.receiverId
       );
-      // const feed = await Post.find();
+      console.log("followingUser==================>", followingUser);
       const feed = await Post.find()
         .where("postedBy")
         .in(followingUser)
         .populate("postedBy", "_id name");
-      res.json(feed);
+      res.render("feed", { feed });
     } catch (err) {
       console.log(err);
       res.status(500).json({ error: "An error occurred" });
