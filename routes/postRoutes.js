@@ -8,10 +8,12 @@ const {
 } = require("../controllers/postController.js");
 const dotenv = require("dotenv");
 const requireLogin = require("../middlewares/auth-middleware.js");
+const checkUserAuth = require("../middlewares/auth-middleware.js");
 const post = require("../models/postModel.js");
+const Post = require("../models/postModel.js");
 
 postRoutes.get("/allpost", requireLogin, PostController.allPost);
-postRoutes.get("/feed", requireLogin, PostController.userFeed);
+postRoutes.get("/feed", checkUserAuth, PostController.userFeed);
 postRoutes.get("/public/uploads");
 
 postRoutes.post(
@@ -20,6 +22,9 @@ postRoutes.post(
   uploadSingle,
   PostController.createPost
 );
+postRoutes.get("/createpost", requireLogin, (req, res) => {
+  res.render("createPost", { pageTitle: "Create Post" });
+});
 
 postRoutes.get("/myposts", requireLogin, PostController.myPost);
 postRoutes.put("/:id/like", requireLogin, PostController.likePost);
@@ -29,6 +34,18 @@ postRoutes.put(
   requireLogin,
   uploadSingle,
   PostController.updatePost
+);
+postRoutes.post(
+  "/:id/updatePost",
+  requireLogin,
+  uploadSingle,
+  PostController.updatePost
+);
+postRoutes.get(
+  "/:id/updatePost",
+  requireLogin,
+  uploadSingle,
+  PostController.renderUpdatePost
 );
 postRoutes.delete("/:id/deletePost", requireLogin, PostController.deletePost);
 

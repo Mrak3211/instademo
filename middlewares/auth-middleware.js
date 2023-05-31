@@ -1,17 +1,25 @@
+// auth-middleware.js
+
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel.js");
 
 const checkUserAuth = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies.jwt || req.headers.authorization;
     // console.log(token);
     if (!token) {
       return res
         .status(401)
         .json({ status: "failed", message: "Unauthorized User, No Token" });
     }
+    const tokenWithoutBearer = token.startsWith("Bearer ")
+      ? token.split(" ")[1]
+      : token;
 
-    const { userID } = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const { userID } = jwt.verify(
+      tokenWithoutBearer,
+      process.env.JWT_SECRET_KEY
+    );
     req.user = await userModel.findById(userID).select("-password");
     if (!req.user) {
       return res

@@ -1,3 +1,5 @@
+// userController.js
+
 const userModel = require("../models/userModel.js");
 const bcrypt = require("bcrypt");
 const express = require("express");
@@ -63,9 +65,10 @@ class userController {
         });
         await newUser.save();
         // console.log(newUser);
-        return resp
-          .status(201)
-          .json({ status: "success", message: "User Registered Successfully" });
+        resp.redirect("/login");
+        // return resp
+        //   .status(201)
+        //   .json({ status: "success", message: "User Registered Successfully" });
       } catch (error) {
         console.error(error);
         return resp
@@ -130,17 +133,18 @@ class userController {
         await resp.cookie("jwt", token, {
           httpOnly: true,
         });
-        return resp.status(200).json({
-          status: "success",
-          message: "Login successful",
-          user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            username: user.username,
-            token: token,
-          },
-        });
+        resp.redirect("/");
+        // return resp.status(200).json({
+        //   status: "success",
+        //   message: "Login successful",
+        //   user: {
+        //     id: user._id,
+        //     name: user.name,
+        //     email: user.email,
+        //     username: user.username,
+        //     token: token,
+        //   },
+        // });
       } catch (error) {
         console.error(error);
         return resp
@@ -188,15 +192,14 @@ class userController {
 
   static userLogout = async (req, resp) => {
     try {
-      // Clear the JWT cookie by setting an expired token
       resp.cookie("jwt", "", {
         expires: new Date(0),
         httpOnly: true,
       });
-
-      return resp
-        .status(200)
-        .json({ status: "success", message: "Logout successful" });
+      resp.redirect("/login");
+      // return resp
+      //   .status(200)
+      //   .json({ status: "success", message: "Logout successful" });
     } catch (error) {
       console.error(error);
       return resp
