@@ -28,7 +28,9 @@ postRoutes.get("/createpost", requireLogin, (req, res) => {
 
 postRoutes.get("/myposts", requireLogin, PostController.myPost);
 postRoutes.put("/:id/like", requireLogin, PostController.likePost);
+postRoutes.get("/:id/like", requireLogin, PostController.likePost);
 postRoutes.put("/:id/unlike", requireLogin, PostController.unLikePost);
+postRoutes.get("/:id/unlike", requireLogin, PostController.unLikePost);
 postRoutes.put(
   "/:id/updatePost",
   requireLogin,
@@ -44,7 +46,6 @@ postRoutes.post(
 postRoutes.get(
   "/:id/updatePost",
   requireLogin,
-  uploadSingle,
   PostController.renderUpdatePost
 );
 postRoutes.delete("/:id/deletePost", requireLogin, PostController.deletePost);

@@ -85,12 +85,34 @@
                                     <p class="posted-by">Posted by: <%= post.postedBy.name %>
                                     </p>
                                 </div>
+                                <% if (true) { %>
+                                    <button class="unlike" onclick="redirectToUnLike('<%= post._id %>')">
+                                        <i class="fa fa-heart"></i>unlike</button>
+                                    <% } else { %>
+                                        <button class="like" onclick="redirectToLike('<%= post._id %>')">
+                                            <i class="fa fa-heart"></i>like</button>
+                                        <% } %>
+                                            <!-- <% if (true) { %>
+                                    <button class="like" onclick="redirectToLike('<%= post._id %>')">
+                                        <i class="fa fa-heart"></i>like</button>
+                                    <%} else { %>
+                                        <button class="unlike" onclick="redirectToUnLike('<%= post._id %>')">
+                                            <i class="fa fa-heart"></i>unlike</button>
+                                        <% } %> -->
                             </div>
                         </div>
                         <% }); %>
                 </div>
                 <% } %>
     </div>
+    <script>
+        function redirectToLike(userId) {
+            location.href = `/${userId}/like`;
+        }
+        function redirectToUnLike(userId) {
+            location.href = `/${userId}/unlike`;
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -59,24 +59,22 @@
                 <div class="card mt-2">
                     <div class="card-body">
                         <h5 class="card-title">Update Post</h5>
-                        <form action="/<%= post.id %>/updatepost" method="POST">
+                        <form action="/<%= postt.id %>/updatepost" method="POST" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="title" class="form-control-label">Title</label>
                                 <input type="text" id="title" name="title" class="form-control"
-                                    value="<%= post.title %>" required>
+                                    value="<%= postt.title %>">
                             </div>
                             <div class="form-group">
                                 <label for="body" class="form-control-label">Body</label>
-                                <textarea id="body" type="text" name="body" class="form-control" rows="4"
-                                    required><%= post.body %></textarea>
+                                <textarea id="body" type="body" name="body" class="form-control"
+                                    rows="4"><%= postt.body %></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="Photo" class="form-control-label">Photo</label>
-                                <input type="file" id="pic" name="pic" class="form-control-file">
+                                <label for="pic">Image</label>
+                                <input type="file" class="form-control" id="pic" name="pic">
                             </div>
-                            <div class="form-group">
-                                <button type="submit" class="submit-button">Update Post</button>
-                            </div>
+                            <button type="submit" class="btn btn-primary submit-button">Update Post</button>
                         </form>
                     </div>
                 </div>
