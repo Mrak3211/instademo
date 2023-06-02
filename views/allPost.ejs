@@ -85,7 +85,7 @@
                                     <p class="posted-by">Posted by: <%= post.postedBy.name %>
                                     </p>
                                 </div>
-                                <% if (true) { %>
+                                <% if (!true) { %>
                                     <button class="like" onclick="redirectToLike('<%= post._id %>')">
                                         <i class="fa fa-heart"></i>like</button>
                                     <%} else { %>

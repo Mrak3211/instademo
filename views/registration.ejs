@@ -133,11 +133,15 @@
                     <input type="text" placeholder="Name" class="input-1" name="name" />
                     <input type="text" placeholder="Email" class="input-1" name="email" />
                     <input type="password" placeholder="Password" class="input-2" name="password" />
-                    <input type="text" placeholder="Phone No" class="input-2" name="phoneNo" />
+                    <input type="text" placeholder="Phone No" class="input-2" name="phoneNo" maxlength="10" value=""
+                        onkeypress="return isNumber(event)" />
                     <input type="date" placeholder="Date Of Birth" class="input-2" name="DateOfBirth" />
                     <input type="submit" value="Sign up" class="btn" />
                 </div>
             </form>
+            <p>
+                <%= err %>
+            </p>
         </div>
         <div class="sub-content">
             <div class="s-part">
@@ -148,6 +152,14 @@
             </div>
         </div>
     </div>
+    <script>function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            let charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }</script>
 </body>
 
 </html>

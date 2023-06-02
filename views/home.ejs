@@ -86,19 +86,12 @@
                                     </p>
                                 </div>
                                 <% if (true) { %>
-                                    <button class="unlike" onclick="redirectToUnLike('<%= post._id %>')">
-                                        <i class="fa fa-heart"></i>unlike</button>
-                                    <% } else { %>
-                                        <button class="like" onclick="redirectToLike('<%= post._id %>')">
-                                            <i class="fa fa-heart"></i>like</button>
-                                        <% } %>
-                                            <!-- <% if (true) { %>
                                     <button class="like" onclick="redirectToLike('<%= post._id %>')">
                                         <i class="fa fa-heart"></i>like</button>
-                                    <%} else { %>
+                                    <% } else { %>
                                         <button class="unlike" onclick="redirectToUnLike('<%= post._id %>')">
                                             <i class="fa fa-heart"></i>unlike</button>
-                                        <% } %> -->
+                                        <% } %>
                             </div>
                         </div>
                         <% }); %>

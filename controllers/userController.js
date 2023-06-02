@@ -13,43 +13,41 @@ class userController {
     if (req.cookies.jwt) {
       return res.redirect("/");
     }
-    res.render("registration");
+    res.render("registration", { err: "" });
   };
 
   static userRegistration = async (req, resp) => {
-    console.log(req.body);
-    const validationRules = [
-      body("name").notEmpty().withMessage("Name is required"),
-      body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
-      body("password").notEmpty().withMessage("Password is required"),
-      body("phoneNo")
-        .notEmpty()
-        .withMessage("Phone number is required")
-        .isLength({ min: 10, max: 10 })
-        .withMessage("Phone number must be 10 digits")
-        .isNumeric()
-        .withMessage("Phone number must contain only numeric digits"),
-      body("DateOfBirth").notEmpty().withMessage("Date of birth is required"),
-    ];
+    // const validationRules = [
+    //   body("name").notEmpty().withMessage("Name is required"),
+    //   body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
+    //   body("password").notEmpty().withMessage(" Password is required"),
+    //   body("phoneNo")
+    //     .notEmpty()
+    //     .withMessage("Phone number is required")
+    //     .isLength({ min: 10, max: 10 })
+    //     .withMessage("Phone number must be 10 digits")
+    //     .isNumeric()
+    //     .withMessage("Phone number must contain only numeric digits"),
+    //   body("DateOfBirth").notEmpty().withMessage("Date of birth is required"),
+    // ];
+    // await Promise.all(validationRules.map((validation) => validation.run(req)));
 
-    // Run validation
-    await Promise.all(validationRules.map((validation) => validation.run(req)));
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return resp.status(400).json({
-        status: "failed",
-        message: "Validation errors",
-        errors: errors.array(),
-      });
-    }
+    // const errors = validationResult(req);
+    // // if (!errors.isEmpty()) {
+    // //   const err = "Validation errors";
+    // //   resp.render("registration", { err });
+    // //   return resp.status(400).json({
+    // //     status: "failed",
+    // //     message: "Validation errors",
+    // //     errors: errors.array(),
+    // //   });
+    // }
     const { name, email, password, phoneNo, DateOfBirth } = req.body;
     const username = email.split("@")[0];
     const user = await userModel.findOne({ email: email });
     if (user) {
-      return resp
-        .status(409)
-        .json({ status: "failed", message: "Email Already Exists" });
+      const err = "Email Already Exists";
+      resp.render("registration", { err });
     }
     if (name && email && password && phoneNo && DateOfBirth) {
       try {
@@ -64,21 +62,15 @@ class userController {
           username: username,
         });
         await newUser.save();
-        // console.log(newUser);
         resp.redirect("/login");
-        // return resp
-        //   .status(201)
-        //   .json({ status: "success", message: "User Registered Successfully" });
       } catch (error) {
         console.error(error);
-        return resp
-          .status(500)
-          .json({ status: "failed", message: "Unable To Register" });
+        const err = "Unable To Register";
+        resp.render("registration", { err });
       }
     } else {
-      return resp
-        .status(400)
-        .json({ status: "failed", message: "All Fields Are Required" });
+      const err = "All Fields Are Required";
+      resp.render("registration", { err });
     }
   };
 
@@ -86,25 +78,21 @@ class userController {
     if (req.cookies.jwt) {
       return res.redirect("/");
     }
-    res.render("login");
+    res.render("login", { err: "" });
   };
   static userLogin = async (req, resp) => {
-    const validationRules = [
-      body("usernameOrEmail")
-        .notEmpty()
-        .withMessage("Username or Email is required"),
-      body("password").notEmpty().withMessage("Password is required"),
-    ];
-    // Run validation
-    await Promise.all(validationRules.map((validation) => validation.run(req)));
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return resp.status(400).json({
-        status: "failed",
-        message: "Validation errors",
-        errors: errors.array(),
-      });
-    }
+    // const validationRules = [
+    //   body("usernameOrEmail")
+    //     .notEmpty()
+    //     .withMessage("Username or Email is required"),
+    //   body("password").notEmpty().withMessage("Password is required"),
+    // ];
+    // await Promise.all(validationRules.map((validation) => validation.run(req)));
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   const err = "Validation errors";
+    //   resp.render("login", { err });
+    // }
 
     const { usernameOrEmail, password } = req.body;
     if (usernameOrEmail && password) {
@@ -113,15 +101,13 @@ class userController {
           $or: [{ name: usernameOrEmail }, { email: usernameOrEmail }],
         });
         if (!user) {
-          return resp
-            .status(404)
-            .json({ status: "failed", message: "User not found" });
+          const err = "User not found";
+          resp.render("login", { err });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-          return resp
-            .status(401)
-            .json({ status: "failed", message: "Invalid password" });
+          const err = "Invalid password";
+          resp.render("login", { err });
         }
         const token = jwt.sign(
           { userID: user._id },
@@ -134,27 +120,15 @@ class userController {
           httpOnly: true,
         });
         resp.redirect("/");
-        // return resp.status(200).json({
-        //   status: "success",
-        //   message: "Login successful",
-        //   user: {
-        //     id: user._id,
-        //     name: user.name,
-        //     email: user.email,
-        //     username: user.username,
-        //     token: token,
-        //   },
-        // });
       } catch (error) {
         console.error(error);
-        return resp
-          .status(500)
-          .json({ status: "failed", message: "Unable to login" });
+
+        const err = "Unable to login";
+        resp.render("login", { err });
       }
     } else {
-      return resp
-        .status(400)
-        .json({ status: "failed", message: "All Fields Are Required" });
+      const err = "All Fields Are Required";
+      resp.render("login", { err });
     }
   };
 
@@ -189,7 +163,6 @@ class userController {
       success: true,
     });
   };
-
   static userLogout = async (req, resp) => {
     try {
       resp.cookie("jwt", "", {
@@ -197,9 +170,6 @@ class userController {
         httpOnly: true,
       });
       resp.redirect("/login");
-      // return resp
-      //   .status(200)
-      //   .json({ status: "success", message: "Logout successful" });
     } catch (error) {
       console.error(error);
       return resp
@@ -208,8 +178,6 @@ class userController {
     }
   };
   static userFollow = async (req, res) => {
-    // console.log(req.params.id); // Recever id
-    // console.log(req.user.id); // Sender id
     if (req.user.id !== req.params.id) {
       try {
         const receiverId = req.params.id;
@@ -223,17 +191,10 @@ class userController {
             message: "User not found",
           });
         }
-        // console.log("receverUser========>", receverUser);
-        // console.log("senderUser=========>", senderUser);
-        // console.log(!receverUser.followers.includes(senderUser.id));
-        // console.log(receverUser.username);
-        // console.log({ followers: senderUser.id });
-
         const existingConnection = await Connection.findOne({
           senderId,
           receiverId,
         });
-        // console.log("existingConnection============>", existingConnection);
         if (existingConnection) {
           return res.status(409).json({
             status: "failed",
@@ -245,10 +206,6 @@ class userController {
           receiverId,
         });
         await newConnection.save();
-        // receiverUser.followers.push(senderId);
-        // senderUser.followings.push(receiverId);
-        // await receiverUser.save();
-        // await senderUser.save();
         res.status(200).json({
           status: "success",
           senderId: senderUser.id,
@@ -269,6 +226,23 @@ class userController {
       });
     }
   };
+  static renderFollowerReq = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const connection = await Connection?.find({
+        receiverId: userId,
+      }).populate("senderId");
+      console.log("connection", connection);
+      res.render("followersRequest", { connection });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: "failed",
+        message: "Something went wrong",
+      });
+    }
+  };
+
   static updateFollowRequest = async (req, res) => {
     const { requestId, status } = req.body;
     try {
@@ -279,25 +253,13 @@ class userController {
           message: "Connection request not found",
         });
       }
-      // console.log("status=============>", status);
-      // console.log("connection.status=============>", connection.status);
+      const user = await User.findById(connection.senderId);
+      const senderIdUsername = user.username;
+      // console.log("senderIdUsername======>", senderIdUsername);
+      const { Accept, Decline } = req.body;
+      // console.log("connection.status======>", connection.status);
       connection.status = status;
       await connection.save();
-      // if (status === 'accepted') {
-      // Update followers and followings arrays based on the connection status
-      // const receiverUser = await User.findByIdAndUpdate(connection.receiverId, {
-      //   $addToSet: { followers: connection.senderId },
-      // });
-      // const senderUser = await User.findByIdAndUpdate(connection.senderId, {
-      //   $addToSet: { followings: connection.receiverId },
-      // });
-      // if (!receiverUser || !senderUser) {
-      //   return res.status(404).json({
-      //     status: "failed",
-      //     message: "User not found",
-      //   });
-      // }
-      // }
       res.status(200).json({
         status: "success",
         message: "Connection request updated successfully",
@@ -312,20 +274,13 @@ class userController {
   };
 
   static userUnFollow = async (req, res) => {
-    // console.log(req.params.id); // Recever id
-    // console.log(req.user.id); // Sender id
     const receiverId = req.params.id;
     const senderId = req.user.id;
-    // console.log(receiverId);
-    // console.log(senderId);
     try {
       const connection = await Connection.findOne({
         senderId,
         receiverId,
       });
-      // console.log("connection=======>", connection);
-      // console.log("senderId=======>", senderId);
-      // console.log("receiverId=======>", receiverId);
       if (!connection) {
         return res.status(404).json({
           status: "failed",
@@ -394,7 +349,6 @@ class userController {
     try {
       const { email, phoneNo, dateOfBirth } = req.body;
 
-      // Find the user in the database by ID
       const user = await userModel.findById(req.user._id);
 
       if (!user) {
@@ -402,13 +356,9 @@ class userController {
           .status(404)
           .json({ status: "failed", message: "User not found" });
       }
-
-      // Update the user's profile details
       user.email = email;
       user.phoneNo = phoneNo;
       user.dateOfBirth = dateOfBirth;
-
-      // Save the updated user in the database
       await user.save();
 
       res
@@ -419,6 +369,22 @@ class userController {
       res
         .status(500)
         .json({ status: "error", message: "Internal server error" });
+    }
+  };
+  static getUserByUsername = async (req, res) => {
+    try {
+      const username = req.params.username;
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        throw new Error("user does not exist");
+      }
+      const { password, jwtToken, __v, role, ...otherInfo } = user._doc;
+      res.render("getuserbyusername", { user });
+    } catch (e) {
+      res.status(500).send({
+        status: "failure",
+        message: e.message,
+      });
     }
   };
 }

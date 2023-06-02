@@ -29,6 +29,7 @@ userRoutes.post("/login", userController.userLogin);
 userRoutes.get("/login", userController.viewLogin);
 
 userRoutes.get("/myProfile", requireLogin, userController.renderMyProfile);
+userRoutes.get("/u/:username", userController.getUserByUsername);
 userRoutes.put("/updateProfile", requireLogin, userController.updateMyProfile);
 userRoutes.post(
   "/updateProfile",
@@ -45,11 +46,24 @@ userRoutes.post("/logout", requireLogin, userController.userLogout);
 userRoutes.get("/logout", requireLogin, userController.userLogout);
 userRoutes.put("/userUpdate/:id", requireLogin, userController.userUpdate);
 userRoutes.put("/:id/follow", requireLogin, userController.userFollow);
+userRoutes.post("/:id/follow", requireLogin, userController.userFollow);
+userRoutes.get("/:id/follow", requireLogin, userController.userFollow);
 userRoutes.put(
   "/followRequest",
   requireLogin,
   userController.updateFollowRequest
 );
+userRoutes.post(
+  "/followRequest",
+  requireLogin,
+  userController.renderFollowerReq
+);
+userRoutes.get(
+  "/followRequest",
+  requireLogin,
+  userController.renderFollowerReq
+);
 userRoutes.put("/:id/unfollow", requireLogin, userController.userUnFollow);
-
+userRoutes.post("/:id/unfollow", requireLogin, userController.userUnFollow);
+userRoutes.get("/:id/unfollow", requireLogin, userController.userUnFollow);
 module.exports = userRoutes;

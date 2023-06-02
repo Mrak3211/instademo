@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
     <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Overpass+Mono" rel="stylesheet">
     <style>
         * {
@@ -118,6 +118,14 @@
         body {
             padding-top: 80px;
         }
+
+
+        element.style {
+            border-block: inherit;
+            background-color: red;
+            text-align: center;
+            color: white;
+        }
     </style>
 
 </head>
@@ -138,6 +146,9 @@
                     <input type="submit" value="Log in" class="btn" />
                 </div>
             </form>
+            <p>
+                <%= err %>
+            </p>
         </div>
         <div class="sub-content">
             <div class="s-part">
