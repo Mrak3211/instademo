@@ -53,35 +53,36 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 offset-lg-2">
-                <div class="card mt-2">
-                    <div class="card-body">
-                        <h5 class="card-title">Update Post</h5>
-                        <form action="/<%= postt.id %>/updatepost" method="POST" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="title" class="form-control-label">Title</label>
-                                <input type="text" id="title" name="title" class="form-control"
-                                    value="<%= postt.title %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="body" class="form-control-label">Body</label>
-                                <textarea id="body" type="body" name="body" class="form-control"
-                                    rows="4"><%= postt.body %></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="pic">Image</label>
-                                <input type="file" class="form-control" id="pic" name="pic">
-                            </div>
-                            <button type="submit" class="btn btn-primary submit-button">Update Post</button>
-                        </form>
+    <% res.setHeader("Cache-Control","no-cache, no-store, must-revaldate") %>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Update Post</h5>
+                            <form action="/<%= postt.id %>/updatepost" method="POST" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="title" class="form-control-label">Title</label>
+                                    <input type="text" id="title" name="title" class="form-control"
+                                        value="<%= postt.title %>">
+                                </div>
+                                <div class="form-group">
+                                    <label for="body" class="form-control-label">Body</label>
+                                    <textarea id="body" type="body" name="body" class="form-control"
+                                        rows="4"><%= postt.body %></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pic">Image</label>
+                                    <input type="file" class="form-control" id="pic" name="pic">
+                                </div>
+                                <button type="submit" class="btn btn-primary submit-button">Update Post</button>
+                            </form>
 
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </body>
 
 </html>

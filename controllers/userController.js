@@ -16,7 +16,7 @@ class userController {
     res.render("registration", { err: "" });
   };
 
-  static userRegistration = async (req, resp) => {
+  static userRegistration = async (req, res) => {
     // const validationRules = [
     //   body("name").notEmpty().withMessage("Name is required"),
     //   body("email").isEmail().withMessage("Invalid email").normalizeEmail(),
@@ -35,8 +35,8 @@ class userController {
     // const errors = validationResult(req);
     // // if (!errors.isEmpty()) {
     // //   const err = "Validation errors";
-    // //   resp.render("registration", { err });
-    // //   return resp.status(400).json({
+    // //   res.render("registration", { err });
+    // //   return res.status(400).json({
     // //     status: "failed",
     // //     message: "Validation errors",
     // //     errors: errors.array(),
@@ -47,7 +47,7 @@ class userController {
     const user = await userModel.findOne({ email: email });
     if (user) {
       const err = "Email Already Exists";
-      resp.render("registration", { err });
+      res.render("registration", { err, res });
     }
     if (name && email && password && phoneNo && DateOfBirth) {
       try {
@@ -62,15 +62,15 @@ class userController {
           username: username,
         });
         await newUser.save();
-        resp.redirect("/login");
+        res.redirect("/login");
       } catch (error) {
         console.error(error);
         const err = "Unable To Register";
-        resp.render("registration", { err });
+        res.render("registration", { err, res });
       }
     } else {
       const err = "All Fields Are Required";
-      resp.render("registration", { err });
+      res.render("registration", { err, res });
     }
   };
 
@@ -78,9 +78,9 @@ class userController {
     if (req.cookies.jwt) {
       return res.redirect("/");
     }
-    res.render("login", { err: "" });
+    res.render("login", { err: "", res });
   };
-  static userLogin = async (req, resp) => {
+  static userLogin = async (req, res) => {
     // const validationRules = [
     //   body("usernameOrEmail")
     //     .notEmpty()
@@ -91,7 +91,7 @@ class userController {
     // const errors = validationResult(req);
     // if (!errors.isEmpty()) {
     //   const err = "Validation errors";
-    //   resp.render("login", { err });
+    //   res.render("login", { err });
     // }
 
     const { usernameOrEmail, password } = req.body;
@@ -102,12 +102,12 @@ class userController {
         });
         if (!user) {
           const err = "User not found";
-          resp.render("login", { err });
+          res.render("login", { err, res });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
           const err = "Invalid password";
-          resp.render("login", { err });
+          res.render("login", { err, res });
         }
         const token = jwt.sign(
           { userID: user._id },
@@ -116,19 +116,21 @@ class userController {
             expiresIn: "1d",
           }
         );
-        await resp.cookie("jwt", token, {
+        await res.cookie("jwt", token, {
           httpOnly: true,
         });
-        resp.redirect("/");
+
+        req.session.tokenn = token;
+        res.redirect("/");
       } catch (error) {
         console.error(error);
 
         const err = "Unable to login";
-        resp.render("login", { err });
+        res.render("login", { err, res });
       }
     } else {
       const err = "All Fields Are Required";
-      resp.render("login", { err });
+      res.render("login", { err, res });
     }
   };
 
@@ -153,7 +155,7 @@ class userController {
         const salt = await bcrypt.genSalt(10);
         req.body.password = await bcrypt.hash(req.body.password, salt);
       } catch (err) {
-        return res.status(500).json(err);
+        return res.status(500).json(err);likedpost
       }
     }
     const user = await User.findByIdAndUpdate(req.params.id, {
@@ -163,16 +165,18 @@ class userController {
       success: true,
     });
   };
-  static userLogout = async (req, resp) => {
+  static userLogout = async (req, res) => {
     try {
-      resp.cookie("jwt", "", {
+      res.cookie("jwt", "", {
         expires: new Date(0),
         httpOnly: true,
       });
-      resp.redirect("/login");
+      console.log("req.session=========>", req.slikedpostession);
+      req.session.destroy();
+      res.redirect("/login");
     } catch (error) {
       console.error(error);
-      return resp
+      return res
         .status(500)
         .json({ status: "failed", message: "Unable to logout" });
     }
@@ -232,8 +236,7 @@ class userController {
       const connection = await Connection?.find({
         receiverId: userId,
       }).populate("senderId");
-      console.log("connection", connection);
-      res.render("followersRequest", { connection });
+      res.render("followersRequest", { connection, res });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -242,9 +245,61 @@ class userController {
       });
     }
   };
+  static acceptReq = async (req, res) => {
+    const reqId = req.params.id;
+    // console.log("reqId=========>", reqId);
+    const userId = req.user.id;
+    const request = await Connection.findById(reqId);
+    // console.log("request=======>", request);
+    if (!request) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Request not found",
+      });
+    }
+    const connections = await Connection.findById(reqId).populate("status");
+    const extingUser = connections.status == "Accept";
+    // console.log(pop.status == "Accept");
+    if (extingUser) {
+      return res.status(409).json({
+        status: "failed",
+        message: "You have already Accepted Request",
+      });
+    } else {
+      const updateStatus = await connections.updateOne({ status: "Accept" });
+      res.redirect("/followRequest");
+    }
+  };
+  static declineReq = async (req, res) => {
+    const reqId = req.params.id;
+    // console.log("reqId=========>", reqId);
+    const userId = req.user.id;
+    const request = await Connection.findById(reqId);
+    // console.log("request=======>", request);
+    if (!request) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Request not found",
+      });
+    }
+    const connections = await Connection.findById(reqId).populate("status");
+    const removedUser =
+      connections.status == "Accept" || connections.status == "Decline";
+    // console.log(pop.status == "Accept");
+    if (removedUser) {
+      return res.status(409).json({
+        status: "failed",
+        message: "You Does not Accepted Request",
+      });
+    } else {
+      const updateStatus = await connections.updateOne({ status: "Decline" });
+      res.redirect("/followRequest");
+    }
+  };
 
   static updateFollowRequest = async (req, res) => {
     const { requestId, status } = req.body;
+    const { Accept } = req.params;
     try {
       const connection = await Connection.findById(requestId);
       if (!connection) {
@@ -272,6 +327,38 @@ class userController {
       });
     }
   };
+  // static followingCount = async (req, res) => {
+  //   const userId = req.user.id;
+  //   try {
+  //     const connection = await Connection.find({ senderId: userId });
+  //     const followingcount = connection.length;
+  //     console.log("count============>", followingcount);
+  //     res.render("profile", { followingcount, res  });
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({
+  //       status: "failed",
+  //       message: "Something went wrong",
+  //     });
+  //   }
+  // };
+  // static followerCount = async (req, res) => {
+  //   const userId = req.user.id;
+  //   // console.log("userId================>", userId);
+  //   try {
+  //     const connection = await Connection.find({ receiverId: userId });
+  //     // console.log("connection======>", connection);
+  //     const followercount = connection.length;
+  //     console.log("count============>", followercount);
+  //     res.render("profile", { followercount, res  });
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({
+  //       status: "failed",
+  //       message: "Something went wrong",
+  //     });
+  //   }
+  // };
 
   static userUnFollow = async (req, res) => {
     const receiverId = req.params.id;
@@ -310,7 +397,17 @@ class userController {
   static renderMyProfile = async (req, res) => {
     try {
       const user = await User.findById(req.user.id);
-      res.render("profile", { user });
+      const following = await Connection.find({
+        senderId: req.user.id,
+        status: "Accept",
+      });
+      const followingCount = following.length.toString();
+      const follower = await Connection.find({
+        receiverId: req.user.id,
+        status: "Accept",
+      });
+      const followerCount = follower.length.toString();
+      res.render("profile", { user, followerCount, followingCount, res });
     } catch (error) {
       console.log(error);
       res.status(500).send("Server Error");
@@ -338,10 +435,10 @@ class userController {
     )
       .then((updatedUser) => {
         const user = req.user;
-        res.render("updateProfile", { user });
+        res.render("updateProfile", { user, res });
       })
       .catch((error) => {
-        res.render("error", { error });
+        res.render("error", { error, res });
       });
   };
 
@@ -358,6 +455,7 @@ class userController {
       }
       user.email = email;
       user.phoneNo = phoneNo;
+      logout;
       user.dateOfBirth = dateOfBirth;
       await user.save();
 
@@ -379,7 +477,7 @@ class userController {
         throw new Error("user does not exist");
       }
       const { password, jwtToken, __v, role, ...otherInfo } = user._doc;
-      res.render("getuserbyusername", { user });
+      res.render("getuserbyusername", { user, res });
     } catch (e) {
       res.status(500).send({
         status: "failure",

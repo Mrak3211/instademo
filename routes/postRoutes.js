@@ -23,10 +23,11 @@ postRoutes.post(
   PostController.createPost
 );
 postRoutes.get("/createpost", requireLogin, (req, res) => {
-  res.render("createPost", { pageTitle: "Create Post" });
+  res.render("createPost", { pageTitle: "Create Post", res });
 });
 
 postRoutes.get("/myposts", requireLogin, PostController.myPost);
+postRoutes.get("/:id/isLike", requireLogin, PostController.isLiked);
 postRoutes.put("/:id/like", requireLogin, PostController.likePost);
 postRoutes.get("/:id/like", requireLogin, PostController.likePost);
 postRoutes.put("/:id/unlike", requireLogin, PostController.unLikePost);

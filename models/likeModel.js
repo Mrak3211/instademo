@@ -16,6 +16,10 @@ const likeSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    isLiked: {
+      type: Boolean,
+      default: null,
+    },
   },
   { timestamps: true }
 );

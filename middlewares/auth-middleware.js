@@ -6,11 +6,9 @@ const userModel = require("../models/userModel.js");
 const checkUserAuth = async (req, res, next) => {
   try {
     const token = req.cookies.jwt || req.headers.authorization;
-    // console.log(token);
+
     if (!token) {
-      return res
-        .status(401)
-        .json({ status: "failed", message: "Unauthorized User, No Token" });
+      return res.redirect("/login");
     }
     const tokenWithoutBearer = token.startsWith("Bearer ")
       ? token.split(" ")[1]

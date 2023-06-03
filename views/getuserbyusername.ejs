@@ -46,47 +46,48 @@
 </head>
 
 <body>
-    <div class="container">
-        <% if (user) { %>
-            <div class="card">
-                <div class="card-body">
-                    <p class="card-text">Name: <%= user.name %>
-                    </p>
-                    <p class="card-text">Username: <%= user.username %>
-                    </p>
-                    <p class="card-text">Email: <%= user.email %>
-                    </p>
-                    <p class="card-text">Phone Number: <%= user.phoneNo %>
-                    </p>
-                    <p class="card-text">Date of Birth: <%= user.DateOfBirth %>
-                    </p>
-                    <% if (true) { %>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger"
-                                onclick="followUser('<%= user._id %>')">Follow</button>
-                        </div>
-                        <% }else { %>
+    <% res.setHeader("Cache-Control","no-cache, no-store, must-revaldate") %>
+        <div class="container">
+            <% if (user) { %>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">Name: <%= user.name %>
+                        </p>
+                        <p class="card-text">Username: <%= user.username %>
+                        </p>
+                        <p class="card-text">Email: <%= user.email %>
+                        </p>
+                        <p class="card-text">Phone Number: <%= user.phoneNo %>
+                        </p>
+                        <p class="card-text">Date of Birth: <%= user.DateOfBirth %>
+                        </p>
+                        <% if (true) { %>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger"
-                                    onclick="unfollowUser('<%= user._id %>')">unFollow</button>
+                                    onclick="followUser('<%= user._id %>')">Follow</button>
                             </div>
-                            <% } %>
+                            <% }else { %>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger"
+                                        onclick="unfollowUser('<%= user._id %>')">unFollow</button>
+                                </div>
+                                <% } %>
+                    </div>
                 </div>
-            </div>
-            <% } else { %>
-                <p>No user profile found.</p>
-                <% } %>
-    </div>
-    <script>
-        function followUser(userId) {
-            location.href = `/${userId}/follow`;
-        }
-        function unfollowUser(userId) {
-            location.href = `/${userId}/unfollow`;
-        }
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+                <% } else { %>
+                    <p>No user profile found.</p>
+                    <% } %>
+        </div>
+        <script>
+            function followUser(userId) {
+                location.href = `/${userId}/follow`;
+            }
+            function unfollowUser(userId) {
+                location.href = `/${userId}/unfollow`;
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

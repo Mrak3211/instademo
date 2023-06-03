@@ -33,9 +33,10 @@ class PostController {
         .populate("postedBy", "_id name")
         .sort("-createdAt");
 
-      res.render("allPost", { postt });
+      res.render("allPost", { postt, res, isLiked: "" });
       // console.log("postt=======>", postt);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: "An error occurred" });
     }
   };
@@ -56,7 +57,7 @@ class PostController {
         .where("postedBy")
         .in(followingUserIds)
         .populate("postedBy", "_id name");
-      res.render("feed", { feed });
+      res.render("feed", { feed, res });
       // console.log("feed in postController===============>", feed);
     } catch (err) {
       console.error(err);
@@ -104,7 +105,7 @@ class PostController {
             message: "Post not found",
           });
         }
-        res.render("updatePost", { postt });
+        res.render("updatePost", { postt, res });
       })
       .catch((err) => {
         console.log(err);
@@ -167,10 +168,37 @@ class PostController {
       const mypostt = await Post?.find({
         postedBy: req.user.id,
       }).populate("postedBy", "_id name");
-      res.render("myPost", { mypostt });
+      res.render("myPost", { mypostt, res });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "An error occurred" });
+    }
+  };
+
+  static isLiked = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const likedpost = await Like.find({
+        senderId: userId,
+        isLiked: true,
+      }).populate("senderId");
+      console.log("likedpost========>", likedpost);
+      const senderId = likedpost?.find((id) => id.senderId).id;
+      const checkLike = likedpost?.filter((like) => like.isLiked);
+      console.log("checkLike=======>", checkLike);
+      const isLiked = senderId === userId || checkLike === true;
+      console.log("isLiked========>", isLiked);
+      res.render("allPost", { isLiked });
+      res.json({
+        status: "Success",
+        message: "Done",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: "failed",
+        message: "Something Went Wrong",
+      });
     }
   };
 
@@ -190,6 +218,7 @@ class PostController {
       const existingLike = await Like.findOne({
         postId: postId,
         senderId: userId,
+        isLiked: true,
       });
       if (existingLike) {
         return res.status(409).json({
@@ -200,6 +229,7 @@ class PostController {
       const like = new Like({
         postId: postId,
         senderId: userId,
+        isLiked: true,
       });
       await like.save();
       res.status(200).json({

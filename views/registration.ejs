@@ -123,43 +123,44 @@
 </head>
 
 <body>
-    <div id="wrapper">
-        <div class="main-content">
-            <div class="header">
-                <img src="https://i.imgur.com/zqpwkLQ.png" />
-            </div>
-            <form action="/signup" method="post">
-                <div class="l-part">
-                    <input type="text" placeholder="Name" class="input-1" name="name" />
-                    <input type="text" placeholder="Email" class="input-1" name="email" />
-                    <input type="password" placeholder="Password" class="input-2" name="password" />
-                    <input type="text" placeholder="Phone No" class="input-2" name="phoneNo" maxlength="10" value=""
-                        onkeypress="return isNumber(event)" />
-                    <input type="date" placeholder="Date Of Birth" class="input-2" name="DateOfBirth" />
-                    <input type="submit" value="Sign up" class="btn" />
+    <% res.setHeader("Cache-Control","no-cache, no-store, must-revaldate") %>
+        <div id="wrapper">
+            <div class="main-content">
+                <div class="header">
+                    <img src="https://i.imgur.com/zqpwkLQ.png" />
                 </div>
-            </form>
-            <p>
-                <%= err %>
-            </p>
-        </div>
-        <div class="sub-content">
-            <div class="s-part">
-                Already have an account? <a href="/login">Log in</a>
+                <form action="/signup" method="post">
+                    <div class="l-part">
+                        <input type="text" placeholder="Name" class="input-1" name="name" />
+                        <input type="text" placeholder="Email" class="input-1" name="email" />
+                        <input type="password" placeholder="Password" class="input-2" name="password" />
+                        <input type="text" placeholder="Phone No" class="input-2" name="phoneNo" maxlength="10" value=""
+                            onkeypress="return isNumber(event)" />
+                        <input type="date" placeholder="Date Of Birth" class="input-2" name="DateOfBirth" />
+                        <input type="submit" value="Sign up" class="btn" />
+                    </div>
+                </form>
+                <p>
+                    <%= err %>
+                </p>
             </div>
-            <div class="s-part">
-                Go to Home <a href="/">Home</a>
+            <div class="sub-content">
+                <div class="s-part">
+                    Already have an account? <a href="/login">Log in</a>
+                </div>
+                <div class="s-part">
+                    Go to Home <a href="/">Home</a>
+                </div>
             </div>
         </div>
-    </div>
-    <script>function isNumber(evt) {
-            evt = (evt) ? evt : window.event;
-            let charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                return false;
-            }
-            return true;
-        }</script>
+        <script>function isNumber(evt) {
+                evt = (evt) ? evt : window.event;
+                let charCode = (evt.which) ? evt.which : evt.keyCode;
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+                return true;
+            }</script>
 </body>
 
 </html>

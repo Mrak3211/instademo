@@ -16,7 +16,7 @@ userRoutes.get("/", async (req, res) => {
     const postt = await Post.find()
       .populate("postedBy", "_id name")
       .sort("-createdAt");
-    res.render("home", { postt });
+    res.render("home", { postt, res });
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
   }
@@ -30,6 +30,8 @@ userRoutes.get("/login", userController.viewLogin);
 
 userRoutes.get("/myProfile", requireLogin, userController.renderMyProfile);
 userRoutes.get("/u/:username", userController.getUserByUsername);
+// userRoutes.get("/followingCount", requireLogin, userController.followingCount);
+// userRoutes.get("/followerCount", requireLogin, userController.followerCount);
 userRoutes.put("/updateProfile", requireLogin, userController.updateMyProfile);
 userRoutes.post(
   "/updateProfile",
@@ -63,6 +65,8 @@ userRoutes.get(
   requireLogin,
   userController.renderFollowerReq
 );
+userRoutes.get("/:id/Accept", requireLogin, userController.acceptReq);
+userRoutes.get("/:id/Decline", requireLogin, userController.declineReq);
 userRoutes.put("/:id/unfollow", requireLogin, userController.userUnFollow);
 userRoutes.post("/:id/unfollow", requireLogin, userController.userUnFollow);
 userRoutes.get("/:id/unfollow", requireLogin, userController.userUnFollow);

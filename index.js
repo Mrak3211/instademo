@@ -15,9 +15,18 @@ const cors = require("cors");
 const path = require("path");
 const ejs = require("ejs");
 app.use(cors());
-var cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser");
 const { PostController } = require("./controllers/postController.js");
 const Post = require("./models/postModel.js");
+const session = require("express-session");
+
+app.use(
+  session({
+    secret: "somerandonstuffs",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -30,11 +39,13 @@ app.use(
   "/files",
   express.static(path.resolve(__dirname, "..", "uploads", "resized"))
 );
+
 // view engine setup
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);

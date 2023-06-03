@@ -23,7 +23,6 @@
                 transition: transform 0.3s;
             }
 
-
             .card-img-top {
                 height: 200px;
                 object-fit: cover;
@@ -38,28 +37,51 @@
                 margin-bottom: 10px;
                 color: #555;
             }
+
+            .btn-accept {
+                color: white;
+                background-color: green;
+                border-color: green;
+            }
+
+            .btn-decline {
+                color: white;
+                background-color: red;
+                border-color: red;
+            }
         </style>
 </head>
 
 <body>
-    <div class="container">
-        <% if (connection.length===0) { %>
-            <p>No user profile found.</p>
-            <% } else { %>
-                <% connection.forEach(function(details) { %>
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class=" card-title">Name: <%= details.senderId.name %>
-                            </h2>
-                            <p class="card-text">UserName: <%= details.senderId.username %>
-                            </p>
-                        </div>
-                        <% }) %>
-                    </div>
-                    <% } %>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <% res.setHeader("Cache-Control","no-cache, no-store, must-revaldate") %>
+        <div class="container">
+            <% if (connection.length===0) { %>
+                <p>No user profile found.</p>
+                <% } else { %>
+                    <% connection.forEach(function(details) { %>
+                        <% if (!(details.status==='Accept' ) && !(details.status==='Decline' )) { %>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="card-title">Name: <%= details.senderId.name %>
+                                    </h2>
+                                    <p class="card-text">Username: <%= details.senderId.username %>
+                                    </p>
+                                    <div class="btn-group">
+                                        <a href="<%= `/${details._id}/Accept` %>">
+                                            <button class="btn btn-accept">Accept</button>
+                                        </a>
+                                        <a href="<%= `/${details._id}/Decline` %>">
+                                            <button class="btn btn-decline">Decline</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                                <% }) %>
+                                    <% } %>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
