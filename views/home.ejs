@@ -66,50 +66,53 @@
 </head>
 
 <body>
-    <% res.setHeader("Cache-Control","no-cache, no-store, must-revaldate") %>
-        <div class="container">
-            <% if (postt.length===0) { %>
-                <p class="no-posts">No posts found.</p>
-                <% } else { %>
-                    <div class="row">
-                        <% postt.forEach(function(post) { %>
-                            <div class="col-lg-4 col-md-6 mb-4">
-                                <div class="card mt-2">
-                                    <img src="../public/uploads/<%= post.photo %>" class="card-img-top" alt="">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <%= post.title %>
-                                        </h5>
-                                        <p class="card-text">
-                                            <%= post.body %>
-                                        </p>
-                                        <p class="posted-by">Posted by: <%= post.postedBy.name %>
-                                        </p>
-                                    </div>
-                                    <% if (true) { %>
-                                        <button class="like" onclick="redirectToLike('<%= post._id %>')">
-                                            <i class="fa fa-heart"></i>like</button>
-                                        <% } else { %>
-                                            <button class="unlike" onclick="redirectToUnLike('<%= post._id %>')">
-                                                <i class="fa fa-heart"></i>unlike</button>
-                                            <% } %>
+    <div class="container">
+        <% if (likedData.length===0) { %>
+            <p class="no-posts">No posts found.</p>
+            <% } else { %>
+                <div class="row">
+                    <%likedData.forEach(function(post) { %>
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card mt-2">
+                                <img src="../public/uploads/<%= post._doc.photo %>" class="card-img-top" alt="">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        Title: <%= post._doc.title %>
+                                    </h5>
+                                    <p class="card-text">
+                                        Body: <%= post._doc.body %>
+                                    </p>
+                                    <p class="card-text">
+                                        PoasteBy: <%= post._doc.postedBy.name %>
+                                    </p>
                                 </div>
-                            </div>
-                            <% }); %>
-                    </div>
-                    <% } %>
-        </div>
-        <script>
-            function redirectToLike(userId) {
-                location.href = `/${userId}/like`;
-            }
-            function redirectToUnLike(userId) {
-                location.href = `/${userId}/unlike`;
-            }
-        </script>
 
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+                                <% if (!post?.isLiked) { %>
+                                    <button class="like" onclick="redirectToLike('<%= post._doc._id %>')">
+                                        <i class="fa fa-heart"></i>like</button>
+                                    <%} else { %>
+                                        <button class="unlike" onclick="redirectToUnLike('<%= post._doc._id %>')">
+                                            <i class="fa fa-heart"></i>unlike</button>
+                                        <% } %>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+                <% } %>
+    </div>
+    <script>
+        function redirectToLike(postId) {
+            // alert('Post liked!');
+            location.href = `/${postId}/like`
+        }
+        function redirectToUnLike(postId) {
+            // alert('Post unliked!');
+            location.href = `/${postId}/unlike`
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

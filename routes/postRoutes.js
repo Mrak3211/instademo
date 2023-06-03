@@ -23,7 +23,8 @@ postRoutes.post(
   PostController.createPost
 );
 postRoutes.get("/createpost", requireLogin, (req, res) => {
-  res.render("createPost", { pageTitle: "Create Post", res });
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+  res.render("createPost", { pageTitle: "Create Post" });
 });
 
 postRoutes.get("/myposts", requireLogin, PostController.myPost);

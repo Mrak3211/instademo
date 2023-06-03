@@ -32,8 +32,15 @@ class PostController {
       const postt = await Post.find()
         .populate("postedBy", "_id name")
         .sort("-createdAt");
-
-      res.render("allPost", { postt, res, isLiked: "" });
+      const likedData = await Promise.all(
+        postt.map(async (item) => {
+          const findLikes = await Like.findOne({ postId: item?._id });
+          return { ...item, isLiked: findLikes?.isLiked };
+        })
+      );
+      // console.log("likedData===========>", likedData);
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("allPost", { postt, likedData });
       // console.log("postt=======>", postt);
     } catch (error) {
       console.log(error);
@@ -44,21 +51,23 @@ class PostController {
   static userFeed = async (req, res) => {
     try {
       const userId = req.user.id;
-      // const user = await User.findById(userId);
-      // console.log("userId=====>", userId);
       const connections = await Connection?.find({ senderId: userId });
-      // console.log("connections=====>", connections);
 
       const followingUserIds = connections.map(
         (connection) => connection.receiverId
       );
-      // console.log("followingUserIds=====>", followingUserIds);
       const feed = await Post.find()
         .where("postedBy")
         .in(followingUserIds)
         .populate("postedBy", "_id name");
-      res.render("feed", { feed, res });
-      // console.log("feed in postController===============>", feed);
+      const likedData = await Promise.all(
+        feed.map(async (item) => {
+          const findLikes = await Like.findOne({ postId: item?._id });
+          return { ...item, isLiked: findLikes?.isLiked };
+        })
+      );
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("feed", { feed, likedData });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "An error occurred" });
@@ -105,7 +114,9 @@ class PostController {
             message: "Post not found",
           });
         }
-        res.render("updatePost", { postt, res });
+
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+        res.render("updatePost", { postt });
       })
       .catch((err) => {
         console.log(err);
@@ -168,7 +179,9 @@ class PostController {
       const mypostt = await Post?.find({
         postedBy: req.user.id,
       }).populate("postedBy", "_id name");
-      res.render("myPost", { mypostt, res });
+
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("myPost", { mypostt });
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "An error occurred" });
@@ -182,12 +195,12 @@ class PostController {
         senderId: userId,
         isLiked: true,
       }).populate("senderId");
-      console.log("likedpost========>", likedpost);
+      // console.log("likedpost========>", likedpost);
       const senderId = likedpost?.find((id) => id.senderId).id;
       const checkLike = likedpost?.filter((like) => like.isLiked);
-      console.log("checkLike=======>", checkLike);
+      // console.log("checkLike=======>", checkLike);
       const isLiked = senderId === userId || checkLike === true;
-      console.log("isLiked========>", isLiked);
+      // console.log("isLiked========>", isLiked);
       res.render("allPost", { isLiked });
       res.json({
         status: "Success",
@@ -232,10 +245,11 @@ class PostController {
         isLiked: true,
       });
       await like.save();
-      res.status(200).json({
-        status: "success",
-        message: "Post liked successfully",
-      });
+      res.redirect("/");
+      // res.status(200).json({
+      //   status: "success",
+      //   message: "Post liked successfully",
+      // });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -265,10 +279,11 @@ class PostController {
       }
       // console.log(like);
       await like.deleteOne();
-      res.status(200).json({
-        status: "success",
-        message: "Post unliked successfully",
-      });
+      res.redirect("/");
+      // res.status(200).json({
+      //   status: "success",
+      //   message: "Post unliked successfully",
+      // });
     } catch (error) {
       console.error(error);
       res.status(500).json({

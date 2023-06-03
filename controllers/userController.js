@@ -47,7 +47,8 @@ class userController {
     const user = await userModel.findOne({ email: email });
     if (user) {
       const err = "Email Already Exists";
-      res.render("registration", { err, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("registration", { err });
     }
     if (name && email && password && phoneNo && DateOfBirth) {
       try {
@@ -66,11 +67,13 @@ class userController {
       } catch (error) {
         console.error(error);
         const err = "Unable To Register";
-        res.render("registration", { err, res });
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+        res.render("registration", { err });
       }
     } else {
       const err = "All Fields Are Required";
-      res.render("registration", { err, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("registration", { err });
     }
   };
 
@@ -78,7 +81,8 @@ class userController {
     if (req.cookies.jwt) {
       return res.redirect("/");
     }
-    res.render("login", { err: "", res });
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+    res.render("login", { err: "" });
   };
   static userLogin = async (req, res) => {
     // const validationRules = [
@@ -102,12 +106,14 @@ class userController {
         });
         if (!user) {
           const err = "User not found";
-          res.render("login", { err, res });
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+          res.render("login", { err });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
           const err = "Invalid password";
-          res.render("login", { err, res });
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+          res.render("login", { err });
         }
         const token = jwt.sign(
           { userID: user._id },
@@ -126,11 +132,13 @@ class userController {
         console.error(error);
 
         const err = "Unable to login";
-        res.render("login", { err, res });
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+        res.render("login", { err });
       }
     } else {
       const err = "All Fields Are Required";
-      res.render("login", { err, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("login", { err });
     }
   };
 
@@ -155,7 +163,8 @@ class userController {
         const salt = await bcrypt.genSalt(10);
         req.body.password = await bcrypt.hash(req.body.password, salt);
       } catch (err) {
-        return res.status(500).json(err);likedpost
+        return res.status(500).json(err);
+        likedpost;
       }
     }
     const user = await User.findByIdAndUpdate(req.params.id, {
@@ -171,7 +180,6 @@ class userController {
         expires: new Date(0),
         httpOnly: true,
       });
-      console.log("req.session=========>", req.slikedpostession);
       req.session.destroy();
       res.redirect("/login");
     } catch (error) {
@@ -236,7 +244,8 @@ class userController {
       const connection = await Connection?.find({
         receiverId: userId,
       }).populate("senderId");
-      res.render("followersRequest", { connection, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("followersRequest", { connection });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -333,7 +342,8 @@ class userController {
   //     const connection = await Connection.find({ senderId: userId });
   //     const followingcount = connection.length;
   //     console.log("count============>", followingcount);
-  //     res.render("profile", { followingcount, res  });
+  // res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+  //     res.render("profile", { followingcount,   });
   //   } catch (error) {
   //     console.error(error);
   //     res.status(500).json({
@@ -350,7 +360,9 @@ class userController {
   //     // console.log("connection======>", connection);
   //     const followercount = connection.length;
   //     console.log("count============>", followercount);
-  //     res.render("profile", { followercount, res  });
+
+  // res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+  //     res.render("profile", { followercount });
   //   } catch (error) {
   //     console.error(error);
   //     res.status(500).json({
@@ -407,7 +419,8 @@ class userController {
         status: "Accept",
       });
       const followerCount = follower.length.toString();
-      res.render("profile", { user, followerCount, followingCount, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("profile", { user, followerCount, followingCount });
     } catch (error) {
       console.log(error);
       res.status(500).send("Server Error");
@@ -435,10 +448,12 @@ class userController {
     )
       .then((updatedUser) => {
         const user = req.user;
-        res.render("updateProfile", { user, res });
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+        res.render("updateProfile", { user });
       })
       .catch((error) => {
-        res.render("error", { error, res });
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+        res.render("error", { error });
       });
   };
 
@@ -477,7 +492,8 @@ class userController {
         throw new Error("user does not exist");
       }
       const { password, jwtToken, __v, role, ...otherInfo } = user._doc;
-      res.render("getuserbyusername", { user, res });
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+      res.render("getuserbyusername", { user });
     } catch (e) {
       res.status(500).send({
         status: "failure",

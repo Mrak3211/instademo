@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const requireLogin = require("../middlewares/auth-middleware.js");
 const User = require("../models/userModel.js");
 const Post = require("../models/postModel.js");
+const Like = require("../models/likeModel.js");
 
 userRoutes.get("/", async (req, res) => {
   if (!req.cookies.jwt) {
@@ -16,8 +17,16 @@ userRoutes.get("/", async (req, res) => {
     const postt = await Post.find()
       .populate("postedBy", "_id name")
       .sort("-createdAt");
-    res.render("home", { postt, res });
-  } catch (error) {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revaldate");
+    const likedData = await Promise.all(
+      postt.map(async (item) => {
+        const findLikes = await Like.findOne({ postId: item?._id });
+        return { ...item, isLiked: findLikes?.isLiked };
+      })
+    );
+    res.render("home", { postt, likedData });
+  } catch (likedData) {
+    console.log(likedData);
     res.status(500).json({ error: "An error occurred" });
   }
 });
